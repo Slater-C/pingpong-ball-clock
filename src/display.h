@@ -37,15 +37,18 @@ typedef struct bufferState
 
 } bufferState;
 
+int getIndex(int x, int y);
+position getPos(int index);
 void initDisplayBuffer(displayBuffer* buffer);
 void initBufferState(displayBuffer* buffer0, displayBuffer* buffer1);
 void flipBuffers();
 displayBuffer* getActiveBuffer();
+displayBuffer* getInactiveBuffer();
 void writeCharacter(displayBuffer* buffer, int character, uint8_t x, uint8_t y);
 void textSolidColor(displayBuffer* buffer, uint8_t hue, uint8_t sat, uint8_t val);
 void backgroundSolidColor(displayBuffer* buffer, uint8_t hue, uint8_t sat, uint8_t val);
 void drawDisplay(displayBuffer* buffer, CRGB leds[]);
-void fadeDisplay(uint8_t fadeSteps, int fadeDelay, CRGB leds[]);
+void fadeDisplay(uint8_t fadeSteps, int fadeDelay, bool fadeRGB, CRGB leds[]);
 void printBufferState(displayBuffer* buffer);
 void printCharacter(displayBuffer* buffer, int character);
 

@@ -9,18 +9,36 @@ int getIndex(int x, int y){
 
 	if(y == 0){
 		index = x;
-		return index;
 	}
 	else if ((y == 2) | (y == 4) | (y == 6)){
 		index = 19*y + x;
-		return index;
 	}
 	else{
 		index = 19*(y+1) - (x + 1);
-		return index;
 	}
 	
-	return 0;
+	if(index > 132){
+		index = 133;
+	}
+	return index;
+
+	// Return the index of an LED for given coordinates.
+	// (0, 0) is the top left corner of the display. 
+	// LEDs are in switchback rows of 19.
+}
+
+position getPos(int index){
+	position pos;
+	pos.y = index / 19;
+
+	if((pos.y == 0) | (pos.y == 2) | (pos.y == 4) | (pos.y == 6)){
+		pos.x = index - (pos.y * 19);
+	}
+	else{
+		pos.x = 19*(pos.y+1) - index - 1;
+	}
+
+	return pos;
 }
 
 void initDisplayBuffer(displayBuffer* buffer){
@@ -66,7 +84,7 @@ void writeCharacter(displayBuffer* buffer, int character, uint8_t x, uint8_t y){
 
 	for (int i = 0; i < 15; i++){
 
-		bool state = characters[character][i];
+		bool state = numbers[character][i];
 		xPos = (i % 3) + x;
 		
 		uint8_t index = getIndex(xPos, yPos);
@@ -123,16 +141,20 @@ void drawDisplay(displayBuffer* buffer, CRGB leds[]){
 		leds[i].setHSV(h, s, v);
 	}
 	FastLED.show();
+	flipBuffers();
 }
 
-void fadeDisplay(uint8_t fadeSteps, int fadeDelay, CRGB leds[]){
+void fadeDisplay(uint8_t fadeSteps, int fadeDelay, bool fadeRGB, CRGB leds[]){
 
 	displayBuffer* next = getActiveBuffer();
 	displayBuffer* previous = getInactiveBuffer();
-	
+	float step = 0;
+
+	CHSV hsvOut;
+	CRGB rgbOut;
 	uint8_t h, s, v, h0, s0, v0, h1, s1, v1;
 
-	for(uint8_t fadeIncrement = 1; fadeIncrement < fadeSteps; fadeIncrement++){
+	for(uint8_t fadeIncrement = 1; fadeIncrement < (fadeSteps + 1); fadeIncrement++){
 		for (int i = 0; i < 133; i++){
 			// Read pixel for active buffer
 			if(!next->layer1[i].transparent){
@@ -157,31 +179,55 @@ void fadeDisplay(uint8_t fadeSteps, int fadeDelay, CRGB leds[]){
 			}
 			else{
 				
-				h1= previous->layer0[i].hue;
+				h1 = previous->layer0[i].hue;
 				s1 = previous->layer0[i].sat;
 				v1 = previous->layer0[i].val;
 			}
 
-			h = h1 + ((h0-h1) * (fadeIncrement/fadeSteps));
-			s = s1 + ((s0-s1) * (fadeIncrement/fadeSteps));
-			v = v1 + ((v0-v1) * (fadeIncrement/fadeSteps));
-			leds[i].setHSV(h, s, v);
+			step = (float)fadeIncrement/fadeSteps;
 
+			if(fadeRGB){
+				// Use RGB
+				CRGB rgb0, rgb1;
+				CHSV hsv0(h0, s0, v0); CHSV hsv1(h1, s1, v1);			
+				hsv2rgb_rainbow(hsv0, rgb0); hsv2rgb_rainbow(hsv1, rgb1);
+				
+				rgbOut.r = rgb1.r + ((rgb0.r-rgb1.r) * (step));
+				rgbOut.g = rgb1.g + ((rgb0.g-rgb1.g) * (step));
+				rgbOut.b = rgb1.b + ((rgb0.b-rgb1.b) * (step));
+				leds[i] = rgbOut;
+				
+			}
+			else{
+				// Use HSV
+				h = h1 + ((h0-h1) * (step));
+				s = s1 + ((s0-s1) * (step));
+				v = v1 + ((v0-v1) * (step));
+				hsvOut.h = h; hsvOut.s = s; hsvOut.v = v;
+				leds[i] = hsvOut;
+			}
 		}
 		FastLED.show();
+		//Serial.println(" Show fade.");
 		FastLED.delay(fadeDelay);
 	}
+	flipBuffers();
 }
 
 void printBufferState(displayBuffer* buffer){
+	int x;
+	int y;
 	for (int i = 0; i < 133; i++){
-		if(!buffer->layer1[i].transparent){
-			Serial.print("1");
+		x = i % 19;
+		y = i / 19;
+
+		if(!buffer->layer1[getIndex(x, y)].transparent){
+			Serial.print("\t"); Serial.print(buffer->layer1[getIndex(x, y)].hue);
 		}
 		else{
-			Serial.print("0");
+			Serial.print("\t"); Serial.print(buffer->layer0[getIndex(x, y)].hue);
 		}
-		if(((i % 19) == 18) && (i != 0)){
+		if(x == 18){
 			Serial.println("");
 		}
 	}
@@ -190,7 +236,7 @@ void printBufferState(displayBuffer* buffer){
 void printCharacter(displayBuffer* buffer, int character){
 
 	for (int i = 0; i < 15; i++){
-		bool state = characters[character][i];
+		bool state = numbers[character][i];
 		Serial.print(state);
 
 		if((i % 3) == 2){
