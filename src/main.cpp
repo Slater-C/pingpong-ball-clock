@@ -42,10 +42,10 @@ void setup(){
     textSolidColor(getActiveBuffer(), 200, 255, 255);
     backgroundSolidColor(getInactiveBuffer(), 100, 255, 100);
     textSolidColor(getInactiveBuffer(), 200, 255, 255);
-    textbuffer1 = createTextBuffer(60);
+    textbuffer1 = createTextBuffer(70);
 
-    writeBuffer3x5(textbuffer1, 0, 0, "wowie", 60);
-    printTextBuffer(textbuffer1, 60);
+    writeBuffer5x7(textbuffer1, 0, 0, "EAT LEAD!!!", 70);
+    printTextBuffer(textbuffer1, 70);
 }
 
 void loop(){
@@ -57,14 +57,14 @@ void loop(){
     //writeFormattedTime(getActiveBuffer(), count);
     
     backgroundSolidColor(getActiveBuffer(), hue, 255, 100);
-    textSolidColor(getActiveBuffer(), hue + 100, 0, 255);
-    displayTextBuffer(getActiveBuffer(), textbuffer1, count1, 1, 60);
+    textSolidColor(getActiveBuffer(), 0, 0, 180);
+    displayTextBuffer(getActiveBuffer(), textbuffer1, count1, 0, 70);
     fadeDisplay(10, 10, true, leds);
     //drawDisplay(getActiveBuffer(), leds);
-    FastLED.delay(20);
-    //count1--;
-    if(count1 < -40){
-        count1 = 30;
+    //FastLED.delay(10);
+    count1--;
+    if(count1 < -65){
+        count1 = 35;
     }
 
     hue+= 10;

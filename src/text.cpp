@@ -13,7 +13,7 @@ void deleteTextBuffer(uint16_t* textBuffer){
     delete[] textBuffer;
 }
 
-void writeBuffer3x5(uint16_t* textbuffer, int x, int y, const char *text, int length){
+void writeBuffer3x5(uint16_t* textbuffer, int x, int y, const char *text, int length){ // length is in pixels! not characters!
 
     char output = 0;
     uint8_t id = 0;
@@ -28,7 +28,7 @@ void writeBuffer3x5(uint16_t* textbuffer, int x, int y, const char *text, int le
             width--;
         }
         
-        Serial.print("char id is: ASCII | ID |~| "); Serial.print((int)output); Serial.print(" | "); Serial.println(id);
+        //Serial.print("char id is: ASCII | ID |~| "); Serial.print((int)output); Serial.print(" | "); Serial.println(id);
         
         for(uint8_t c = 0; c < 3; c++){
             
@@ -51,11 +51,49 @@ void writeBuffer3x5(uint16_t* textbuffer, int x, int y, const char *text, int le
     }
 }
 
+void writeBuffer5x7(uint16_t* textbuffer, int x, int y, const char *text, int length){  // length is in pixels! not characters!
+
+    char output = 0;
+    uint8_t id = 0;
+    int width = 0;
+
+    while(*text){
+
+        output = *(text++);
+
+        id = getID5x7(output);
+        if(id == 0){
+            width--;
+        }
+        
+        //Serial.print("char id is: ASCII | ID |~| "); Serial.print((int)output); Serial.print(" | "); Serial.println(id);
+        
+        for(uint8_t c = 0; c < 5; c++){
+            
+            uint8_t column = font_5x7[id][c];
+            int location = x + c + width;
+            if(location > (length - 3)){
+                Serial.println("Text buffer overrun.");
+                return;
+            }
+            textbuffer[location] |= (column << y);
+            
+        }
+        if(id != 0){
+            width += 6;
+        }
+        else{
+            width += 5;
+        }
+        
+    }
+}
+
 void displayTextBuffer(displayBuffer* buffer, uint16_t* textBuffer, int xOffset, int yOffset, int length){
 
     for(uint8_t x = 0; x < 19; x++){
         for(uint8_t y = 0; y < 7; y++){
-            if(((x - xOffset) >= 0) && ((y - yOffset) >= 0) && ((x - xOffset) <= length)){
+            if(((x - xOffset) >= 0) && ((y - yOffset) >= 0) && ((x - xOffset) < length)){
                 buffer->layer1[getIndex(x, y)].transparent = !(0x01 & (textBuffer[x - xOffset] >> (y - yOffset))); 
                 // Transform 16 bit columns of the text buffer to the displaybuffer format of a 133 element array
                 // with transparency states for each LED.

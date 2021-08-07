@@ -92,25 +92,8 @@ char getID3x5(char letter){
     return out;
 }
 
-char getID3x5(char letter){
-    char out = 0;
-    if((letter >= 48) && (letter <= 57)){
-        out = letter - 45;
-    }
-    if((letter >= 65) && (letter <= 90)){
-        out = letter - 52;
-    }
-    if((letter >= 97) && (letter <= 122)){
-        out = letter - 58;
-    }
-    else if((letter == 32) | (letter == 33)){
-        out = letter - 32;
-    }
-    else if(letter == 46){
-        out = 2;
-    }
-    // else letter is not in range, will return ID for a space
-    return out;
+char getID5x7(char letter){
+    return letter - 32;
 }
 
 const uint8_t font_3x5[66][3] = {
