@@ -3,6 +3,7 @@
 #include "display.h"
 #include "clock.h"
 #include "text.h"
+#include "effects.h"
 
 // Information about the LED strip itself
 #define LED_PIN     4
@@ -11,16 +12,23 @@
 #define COLOR_ORDER RGB
 CRGB leds[NUM_LEDS];
 
-#define BRIGHTNESS  50
+#define BRIGHTNESS  255
 
 displayBuffer buffer0;
 displayBuffer buffer1;
 uint16_t* textbuffer1;
+uint16_t* textbuffer2;
+uint16_t* textbuffer3;
 uint8_t hue = 0;
 int count1 = 0;
 int count2 = 0;
-bool invert1 = false;
-bool invert2 = false;
+int count3 = 0;
+bool buttonState = false;
+bool lastButtonState = false;
+int mode = 0;
+int lastPress = 0;
+bool spawn_snow = false;
+bool christmas_alternate = false;
 
 void setup(){
 
@@ -38,85 +46,81 @@ void setup(){
 
     writeFormattedTime(getActiveBuffer(), 1234);
     writeFormattedTime(getInactiveBuffer(), 5678);
-    backgroundSolidColor(getActiveBuffer(), 100, 255, 100);
+    backgroundSolidColor(getActiveBuffer(), 100, 255, 0);
     textSolidColor(getActiveBuffer(), 200, 255, 255);
-    backgroundSolidColor(getInactiveBuffer(), 100, 255, 100);
+    backgroundSolidColor(getInactiveBuffer(), 100, 255, 0);
     textSolidColor(getInactiveBuffer(), 200, 255, 255);
-    textbuffer1 = createTextBuffer(70);
+    textbuffer1 = createTextBuffer(100);
+    textbuffer2 = createTextBuffer(220);
+    textbuffer3 = createTextBuffer(90);
 
-    writeBuffer5x7(textbuffer1, 0, 0, "EAT LEAD!!!", 70);
-    printTextBuffer(textbuffer1, 70);
+    writeBuffer5x7(textbuffer1, 0, 0, "Happy Holidays!", 100);
+    writeBuffer5x7(textbuffer2, 0, 0, "Call for a better time:860 706 9223", 220);
+    writeBuffer5x7(textbuffer3, 0, 0, "bruh          ", 90);
+    //printTextBuffer(textbuffer1, 90);
+
+    pinMode(39, INPUT_PULLDOWN);
 }
 
 void loop(){
 
     
+    // buttonState = digitalRead(39);
+    // if((buttonState != lastButtonState) && ((lastPress + 400) <= millis())){
+    //     //mode++;
+    //     Serial.println("button is pressed");
+    //     if(mode >= 3){
+    //         mode = 0;
+    //     }
+    //     lastPress = millis();
+    //     lastButtonState = buttonState;
+    // }
     
-    
-    //fadeDisplay(10, 20, true, leds);
-    //writeFormattedTime(getActiveBuffer(), count);
-    
-    backgroundSolidColor(getActiveBuffer(), hue, 255, 100);
-    textSolidColor(getActiveBuffer(), 0, 0, 180);
-    displayTextBuffer(getActiveBuffer(), textbuffer1, count1, 0, 70);
-    fadeDisplay(10, 10, true, leds);
-    //drawDisplay(getActiveBuffer(), leds);
-    //FastLED.delay(10);
-    count1--;
-    if(count1 < -65){
-        count1 = 35;
-    }
 
-    hue+= 10;
+            //fadeDisplay(10, 20, true, leds);
+            //writeFormattedTime(getActiveBuffer(), count);
+            
+	//backgroundSolidColor(getActiveBuffer(), hue, 255, 0);
+
+	
+	backgroundSnow(getActiveBuffer(), 20, 0, 2, spawn_snow);
+	
+	
+	if(christmas_alternate){
+		textSolidColor(getActiveBuffer(), 0, 240, 255);
+	}
+	else{
+		textSolidColor(getActiveBuffer(), 96, 240, 255);
+	}
+	
+
+	displayTextBuffer(getActiveBuffer(), textbuffer1, count1, 0, 100);
+	fadeDisplay(7, 10, true, leds);
+	//drawDisplay(getActiveBuffer(), leds);
+	//FastLED.delay(10);
+	count1--;
+	if(count1 < -200){
+		count1 = 27;
+		christmas_alternate = !christmas_alternate;
+	}
+	if((count1 < 27) && (count1 > -82)){
+		spawn_snow = false;
+	}
+	else{
+		spawn_snow = true;
+	}
+
+	//hue+= 10;
+
+    //Serial.println(mode);
+
+    
 
 
 
 }
 
 
-void bounceText(){
-
-    //fadeDisplay(10, 20, true, leds);
-    //writeFormattedTime(getActiveBuffer(), count);
-    //count++;
-    backgroundSolidColor(getActiveBuffer(), hue, 255, 100);
-    textSolidColor(getActiveBuffer(), hue + 100, 255, 255);
-    displayTextBuffer(getActiveBuffer(), textbuffer1, count1, count2, 60);
-    fadeDisplay(10, 10, true, leds);
-    //drawDisplay(getActiveBuffer(), leds);
-    //FastLED.delay(30);
-    
-    if(invert1){
-        count1--;
-    }
-    else{
-        count1++;
-    }
-    if(invert2){
-        count2--;
-    }
-    else{
-        count2++;
-    }
-    
-    if(count1 >= 8){
-        invert1 = true;
-    }
-    if(count2 >= 2){
-        invert2 = true;
-    }
-    
-    if(count1 <= 0){
-        invert1 = false;
-    }
-    if(count2 <= 0){
-        invert2 = false;
-    }
-
-    hue+= 10;
-
-
-}
 
     // FPS testing
     // count++;

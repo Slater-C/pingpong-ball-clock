@@ -18,6 +18,7 @@ typedef struct displayBuffer
 
     pixel layer0[134];  // Display buffer has an extra space for overflow pixels
     pixel layer1[134];
+	pixel layer2[134];
 
 } displayBuffer;
 

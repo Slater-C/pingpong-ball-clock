@@ -6,6 +6,9 @@ bufferState activeBuffer;
 
 int getIndex(int x, int y){
 	int index = 0;
+	if(y < 0){
+		y = 0;
+	}
 
 	if(y == 0){
 		index = x;
@@ -46,6 +49,7 @@ void initDisplayBuffer(displayBuffer* buffer){
 	for (int i = 0; i < 133; i++){
 		buffer->layer0[i].transparent = false;
 		buffer->layer1[i].transparent = true;
+		buffer->layer2[i].transparent = true;
 		
 		buffer->layer0[i].hue = 0;
 		buffer->layer0[i].sat = 0;
@@ -54,6 +58,10 @@ void initDisplayBuffer(displayBuffer* buffer){
 		buffer->layer1[i].hue = 0;
 		buffer->layer1[i].sat = 0;
 		buffer->layer1[i].val = 0;
+		
+		buffer->layer2[i].hue = 0;
+		buffer->layer2[i].sat = 0;
+		buffer->layer2[i].val = 0;
 	}
 
 	// This function sets up an empty display buffer
@@ -126,7 +134,13 @@ void drawDisplay(displayBuffer* buffer, CRGB leds[]){
     uint8_t v;
 
 	for (int i = 0; i < 133; i++){
-		if(!buffer->layer1[i].transparent){
+		if(!buffer->layer2[i].transparent){
+			
+			h = buffer->layer2[i].hue;
+			s = buffer->layer2[i].sat;
+			v = buffer->layer2[i].val;
+		}
+		else if(!buffer->layer1[i].transparent){
 			
 			h = buffer->layer1[i].hue;
 			s = buffer->layer1[i].sat;
@@ -157,7 +171,13 @@ void fadeDisplay(uint8_t fadeSteps, int fadeDelay, bool fadeRGB, CRGB leds[]){
 	for(uint8_t fadeIncrement = 1; fadeIncrement < (fadeSteps + 1); fadeIncrement++){
 		for (int i = 0; i < 133; i++){
 			// Read pixel for active buffer
-			if(!next->layer1[i].transparent){
+			if(!next->layer2[i].transparent){
+				
+				h0 = next->layer2[i].hue;
+				s0 = next->layer2[i].sat;
+				v0 = next->layer2[i].val;
+			}
+			else if(!next->layer1[i].transparent){
 				
 				h0 = next->layer1[i].hue;
 				s0 = next->layer1[i].sat;
@@ -171,7 +191,13 @@ void fadeDisplay(uint8_t fadeSteps, int fadeDelay, bool fadeRGB, CRGB leds[]){
 			}
 
 			// Read pixel for previous buffer
-			if(!previous->layer1[i].transparent){
+			if(!previous->layer2[i].transparent){
+				
+				h1 = previous->layer2[i].hue;
+				s1 = previous->layer2[i].sat;
+				v1 = previous->layer2[i].val;
+			}
+			else if(!previous->layer1[i].transparent){
 				
 				h1 = previous->layer1[i].hue;
 				s1 = previous->layer1[i].sat;
