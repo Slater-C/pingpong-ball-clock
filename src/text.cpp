@@ -19,35 +19,40 @@ void writeBuffer3x5(uint16_t* textbuffer, int x, int y, const char *text, int le
     uint8_t id = 0;
     int width = 0;
 
+	const char *textlen = text;
+	while(*textlen){
+		output = *(textlen++);
+
+        id = getID3x5(output);
+		uint8_t char_width = font_3x5[id][0];
+		width += char_width + 1;
+	}
+
+	//create text buffer of size width and return it
+
+	width = 0;
+
     while(*text){
 
         output = *(text++);
 
         id = getID3x5(output);
-        if(id == 0){
-            width--;
-        }
-        
+		//Serial.print("width is"); Serial.println(width);
+		uint8_t char_width = font_3x5[id][0];
+			for(uint8_t c = 0; c < char_width; c++){
+				
+				uint8_t column = font_3x5[id][c+1];
+				int location = x + c + width;
+				if(location > (length - char_width)){
+					Serial.println("Text buffer overrun.");
+					return;
+				}
+				textbuffer[location] |= (column << y);
+				
+			}
+			width += char_width + 1;
+
         //Serial.print("char id is: ASCII | ID |~| "); Serial.print((int)output); Serial.print(" | "); Serial.println(id);
-        
-        for(uint8_t c = 0; c < 3; c++){
-            
-            uint8_t column = font_3x5[id][c];
-            int location = x + c + width;
-            if(location > (length - 3)){
-                Serial.println("Text buffer overrun.");
-                return;
-            }
-            textbuffer[location] |= (column << y);
-            
-        }
-        if(id != 0){
-            width += 4;
-        }
-        else{
-            width += 3;
-        }
-        
     }
 }
 
@@ -57,34 +62,39 @@ void writeBuffer5x7(uint16_t* textbuffer, int x, int y, const char *text, int le
     uint8_t id = 0;
     int width = 0;
 
+	while(*text){
+		output = *(text++);
+
+        id = getID5x7(output);
+		uint8_t char_width = font_5x7[id][0];
+		width += char_width + 1;
+	}
+
+	//create text buffer of size width and return it
+
+	width = 0;
+
     while(*text){
 
         output = *(text++);
 
         id = getID5x7(output);
-        if(id == 0){
-            width--;
-        }
-        
+		uint8_t char_width = font_5x7[id][0];
+			for(uint8_t c = 0; c < char_width; c++){
+				
+				uint8_t column = font_5x7[id][c+1];
+				int location = x + c + width;
+				if(location > (length - char_width)){
+					Serial.println("Text buffer overrun.");
+					return;
+				}
+				textbuffer[location] |= (column << y);
+				
+			}
+			width += char_width + 1;
+
         //Serial.print("char id is: ASCII | ID |~| "); Serial.print((int)output); Serial.print(" | "); Serial.println(id);
         
-        for(uint8_t c = 0; c < 5; c++){
-            
-            uint8_t column = font_5x7[id][c];
-            int location = x + c + width;
-            if(location > (length - 3)){
-                Serial.println("Text buffer overrun.");
-                return;
-            }
-            textbuffer[location] |= (column << y);
-            
-        }
-        if(id != 0){
-            width += 6;
-        }
-        else{
-            width += 5;
-        }
         
     }
 }

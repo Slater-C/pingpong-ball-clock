@@ -117,6 +117,40 @@ void textSolidColor(displayBuffer* buffer, uint8_t hue, uint8_t sat, uint8_t val
 	}
 }
 
+void textRainbow(displayBuffer* buffer, uint8_t density_x, uint8_t density_y, uint8_t tick, uint8_t brightness){
+
+	for (int i = 0; i < 133; i++){
+		position pos = getPos(i);
+
+		buffer->layer1[i].hue = pos.x*density_x + pos.y*density_y + tick;
+		buffer->layer1[i].sat = 255;
+		buffer->layer1[i].val = brightness;
+	}
+}
+
+void invertText(displayBuffer* buffer){
+	
+	for (int i = 0; i < 133; i++){
+		buffer->layer1[i].transparent = !buffer->layer1[i].transparent;
+	}
+}
+
+void textUkraineColors(displayBuffer* buffer, uint8_t val){
+
+	for (int i = 0; i < 76; i++){
+
+		buffer->layer1[i].hue = 160;
+		buffer->layer1[i].sat = 240;
+		buffer->layer1[i].val = val;
+	}
+	for (int i = 76; i < 133; i++){
+
+		buffer->layer1[i].hue = 56;
+		buffer->layer1[i].sat = 240;
+		buffer->layer1[i].val = val;
+	}
+}
+
 void backgroundSolidColor(displayBuffer* buffer, uint8_t hue, uint8_t sat, uint8_t val){
 
 	for (int i = 0; i < 133; i++){
@@ -124,6 +158,17 @@ void backgroundSolidColor(displayBuffer* buffer, uint8_t hue, uint8_t sat, uint8
 		buffer->layer0[i].hue = hue;
 		buffer->layer0[i].sat = sat;
 		buffer->layer0[i].val = val;
+	}
+}
+
+void backgroundRainbow(displayBuffer* buffer, uint8_t density_x, uint8_t density_y, uint8_t tick, uint8_t brightness){
+
+	for (int i = 0; i < 133; i++){
+		position pos = getPos(i);
+
+		buffer->layer0[i].hue = pos.x*density_x + pos.y*density_y + tick;
+		buffer->layer0[i].sat = 255;
+		buffer->layer0[i].val = brightness;
 	}
 }
 

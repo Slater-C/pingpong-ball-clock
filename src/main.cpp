@@ -45,27 +45,44 @@ void setup(){
     initBufferState(&buffer0, &buffer1);
 
     writeFormattedTime(getActiveBuffer(), 1234);
-    writeFormattedTime(getInactiveBuffer(), 5678);
-    backgroundSolidColor(getActiveBuffer(), 100, 255, 0);
-    textSolidColor(getActiveBuffer(), 200, 255, 255);
-    backgroundSolidColor(getInactiveBuffer(), 100, 255, 0);
-    textSolidColor(getInactiveBuffer(), 200, 255, 255);
-    textbuffer1 = createTextBuffer(100);
+    // writeFormattedTime(getInactiveBuffer(), 5678);
+    // backgroundSolidColor(getActiveBuffer(), 100, 255, 0);
+    // textSolidColor(getActiveBuffer(), 200, 255, 255);
+    // backgroundSolidColor(getInactiveBuffer(), 100, 255, 0);
+    // textSolidColor(getInactiveBuffer(), 200, 255, 255);
+    textbuffer1 = createTextBuffer(25);
     textbuffer2 = createTextBuffer(220);
     textbuffer3 = createTextBuffer(90);
+	writeBuffer3x5(textbuffer1, 0, 0, "12:34", 25);
 
-    writeBuffer5x7(textbuffer1, 0, 0, "Happy Holidays!", 100);
-    writeBuffer5x7(textbuffer2, 0, 0, "Call for a better time:860 706 9223", 220);
-    writeBuffer5x7(textbuffer3, 0, 0, "bruh          ", 90);
-    //printTextBuffer(textbuffer1, 90);
+    // writeBuffer5x7(textbuffer1, 0, 0, "\x80SLAVA UKRAINI\x80", 25);
+    // writeBuffer5x7(textbuffer2, 0, 0, "Call for a better time:860 706 9223", 220);
+    // writeBuffer5x7(textbuffer3, 0, 0, "bruh          ", 90);
+    // printTextBuffer(textbuffer1, 25);
+	
 
     pinMode(39, INPUT_PULLDOWN);
 }
 
 void loop(){
 
-    
-    // buttonState = digitalRead(39);
+    static uint8_t density_x = 1;
+    static uint8_t density_y = 1;
+    static uint8_t tick = 0;
+
+	density_x = 4;
+	density_y = 4;
+	backgroundRainbow(getActiveBuffer(), density_x, density_y, tick, 0);
+	displayTextBuffer(getActiveBuffer(), textbuffer1, 3, 1, 25);
+	textRainbow(getActiveBuffer(), density_x, density_y, tick-80, 120);
+	fadeDisplay(7, 9, true, leds);
+	tick+=2;
+	//printTextBuffer(textbuffer1, 25);
+
+	
+	
+	
+	// buttonState = digitalRead(39);
     // if((buttonState != lastButtonState) && ((lastPress + 400) <= millis())){
     //     //mode++;
     //     Serial.println("button is pressed");
@@ -83,32 +100,21 @@ void loop(){
 	//backgroundSolidColor(getActiveBuffer(), hue, 255, 0);
 
 	
-	backgroundSnow(getActiveBuffer(), 20, 0, 2, spawn_snow);
+	//backgroundSnow(getActiveBuffer(), 20, 0, 2, spawn_snow);
 	
 	
-	if(christmas_alternate){
-		textSolidColor(getActiveBuffer(), 0, 240, 255);
-	}
-	else{
-		textSolidColor(getActiveBuffer(), 96, 240, 255);
-	}
+	
 	
 
-	displayTextBuffer(getActiveBuffer(), textbuffer1, count1, 0, 100);
-	fadeDisplay(7, 10, true, leds);
-	//drawDisplay(getActiveBuffer(), leds);
-	//FastLED.delay(10);
-	count1--;
-	if(count1 < -200){
-		count1 = 27;
-		christmas_alternate = !christmas_alternate;
-	}
-	if((count1 < 27) && (count1 > -82)){
-		spawn_snow = false;
-	}
-	else{
-		spawn_snow = true;
-	}
+	// displayTextBuffer(getActiveBuffer(), textbuffer1, count1, 0, 110);
+	// textUkraineColors(getActiveBuffer(), 255);
+	// //drawDisplay(getActiveBuffer(), leds);
+	// //FastLED.delay(10);
+	// count1--;
+	// if(count1 < -95){
+	// 	count1 = 27;
+	// 	christmas_alternate = !christmas_alternate;
+
 
 	//hue+= 10;
 

@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "Ping Pong Ball Clock Platformio",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}
